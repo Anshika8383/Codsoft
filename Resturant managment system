@@ -1,0 +1,29 @@
+print("welcome to the resturant")
+print("menu")
+print("1. pizza- 200rs.")
+print("2. burger- 100rs.")
+print("3. Momos- 80rs.")
+print("4. Dosa- 150rs.")
+print("What did you like to order sir/mam?")
+
+menu = {"pizza": 200, "burger": 100,"momos": 80, "dosa": 150}
+flag = True
+bill = 0
+i = 1
+while(flag):
+    a = input("enter the item: ")
+    item = a.lower()
+    if(item in menu):
+        print("item added...")
+        print("you may type 'No' when your order is completed.")
+        bill = bill+ menu[item]
+    elif(item == "No" or item == "no" or item == "NO"):
+         flag = False
+    else:
+        print("Sorry! Not available, enter another items: ")
+    i = i+1
+print("your total bill is", bill, "rs.")
+print("Thank you for coming! visit us again..")
+fb = input("Also give us feedback: ")
+print("customer feedback:", fb)
+
