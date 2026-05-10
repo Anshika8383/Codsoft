@@ -1,0 +1,271 @@
+--CREATE DATABASE IF NOT EXISTS library_management;
+
+--USE library_management;
+
+-- =========================================
+-- BOOK CATEGORIES TABLE
+-- =========================================
+
+CREATE TABLE book_categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(100) NOT NULL
+);
+
+-- =========================================
+-- BRANCHES TABLE
+-- =========================================
+
+CREATE TABLE branches (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    branch VARCHAR(100) NOT NULL
+);
+
+-- =========================================
+-- STUDENT CATEGORIES TABLE
+-- =========================================
+
+CREATE TABLE student_categories (
+    cat_id INT AUTO_INCREMENT PRIMARY KEY,
+    category VARCHAR(100) NOT NULL,
+    max_allowed INT NOT NULL
+);
+
+-- =========================================
+-- USERS TABLE
+-- =========================================
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    verification_status TINYINT(1) DEFAULT 0
+);
+
+-- =========================================
+-- BOOKS TABLE
+-- =========================================
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
+    description TEXT,
+    category_id INT,
+    added_by INT,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (category_id)
+    REFERENCES book_categories(id),
+
+    FOREIGN KEY (added_by)
+    REFERENCES users(id)
+);
+
+-- =========================================
+-- STUDENTS TABLE
+-- =========================================
+
+CREATE TABLE students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    roll_num VARCHAR(20) UNIQUE,
+    branch INT,
+    year INT,
+    email_id VARCHAR(100),
+    books_issued INT DEFAULT 0,
+    approved TINYINT(1) DEFAULT 1,
+
+    FOREIGN KEY (branch)
+    REFERENCES branches(id)
+);
+
+-- =========================================
+-- BOOK ISSUE TABLE
+-- =========================================
+
+CREATE TABLE book_issue (
+    issue_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT,
+    student_id INT,
+    issued_date DATE,
+    return_date DATE,
+    status VARCHAR(50),
+
+    FOREIGN KEY (book_id)
+    REFERENCES books(book_id),
+
+    FOREIGN KEY (student_id)
+    REFERENCES students(student_id)
+);
+
+-- =========================================
+-- INSERT BOOK CATEGORIES
+-- =========================================
+
+INSERT INTO book_categories(category)
+VALUES
+('Programming'),
+('Database'),
+('AI'),
+('Networking');
+
+-- =========================================
+-- INSERT BRANCHES
+-- =========================================
+
+INSERT INTO branches(branch)
+VALUES
+('BCA'),
+('BTech'),
+('MCA');
+
+-- =========================================
+-- INSERT STUDENT CATEGORIES
+-- =========================================
+
+INSERT INTO student_categories(category, max_allowed)
+VALUES
+('Regular', 3),
+('Premium', 5);
+
+-- =========================================
+-- INSERT USERS
+-- =========================================
+
+INSERT INTO users(name, username, password)
+VALUES
+('Admin', 'admin', 'admin123');
+
+-- =========================================
+-- INSERT BOOKS
+-- =========================================
+
+INSERT INTO books
+(title, author, description, category_id, added_by)
+
+VALUES
+
+('Python Basics',
+'Rahul Sharma',
+'Python beginner book',
+1,
+1),
+
+('SQL Mastery',
+'Ankit Verma',
+'Advanced SQL concepts',
+2,
+1),
+
+('Machine Learning',
+'Priya Singh',
+'AI concepts book',
+3,
+1);
+
+-- =========================================
+-- INSERT STUDENTS
+-- =========================================
+
+INSERT INTO students
+(first_name, last_name, roll_num, branch, year, email_id)
+
+VALUES
+
+('Anshika',
+'Rajora',
+'BCA101',
+1,
+2,
+'anshika@gmail.com'),
+
+('Rahul',
+'Kumar',
+'BTECH102',
+2,
+3,
+'rahul@gmail.com');
+
+-- =========================================
+-- ISSUE BOOKS
+-- =========================================
+
+INSERT INTO book_issue
+(book_id, student_id, issued_date, return_date, status)
+
+VALUES
+
+(1, 1, '2026-05-01', '2026-05-10', 'Issued'),
+
+(2, 2, '2026-05-03', '2026-05-12', 'Issued');
+
+-- =========================================
+-- SHOW ALL BOOKS
+-- =========================================
+
+SELECT * FROM books;
+
+-- =========================================
+-- SHOW ALL STUDENTS
+-- =========================================
+
+SELECT * FROM students;
+
+-- =========================================
+-- SHOW ISSUED BOOKS
+-- =========================================
+
+SELECT
+students.first_name,
+students.last_name,
+books.title,
+book_issue.issued_date,
+book_issue.return_date
+
+FROM book_issue
+
+JOIN students
+ON book_issue.student_id = students.student_id
+
+JOIN books
+ON book_issue.book_id = books.book_id;
+
+-- =========================================
+-- COUNT TOTAL BOOKS
+-- =========================================
+
+SELECT COUNT(*) AS total_books
+FROM books;
+
+-- =========================================
+-- SHOW BOOKS CATEGORY WISE
+-- =========================================
+
+SELECT
+book_categories.category,
+COUNT(books.book_id) AS total_books
+
+FROM books
+
+JOIN book_categories
+ON books.category_id = book_categories.id
+
+GROUP BY book_categories.category;
+
+-- =========================================
+-- SHOW STUDENTS FROM BCA
+-- =========================================
+
+SELECT
+students.first_name,
+students.last_name,
+branches.branch
+
+FROM students
+
+JOIN branches
+ON students.branch = branches.id
+
+WHERE branches.branch = 'BCA';
